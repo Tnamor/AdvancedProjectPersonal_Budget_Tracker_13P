@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-left">
+      <span class="logo">💸</span>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="#">Analytics</a>
+      <a href="#">Calendar</a>
+      <a href="#">Settings</a>
+    </div>
+    <div class="nav-right">
+      <a href="{{ url_for('oauth.connect_wallet') }}" class="btn-connect">Connect Wallet</a>
+      <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Hello, {{ current_user.email }}!</h1>
+
+      <div class="card-container">
+        {% for account in accounts %}
+          <div class="card" onclick="location.href='{{ url_for('account_detail', account_id=account.id) }}'" style="cursor: pointer;">
+            <div class="card-header">
+              <span>{{ account.account_name }}</span>
+              <button class="menu-btn icon-btn" onclick="event.stopPropagation(); toggleMenu('{{ account.id }}')">⋮</button>
+            </div>
+            <div class="card-info">
+              <p>Bank: {{ account.bank_name }}</p>
+              <p>****{{ account.last4 }}</p>
+              <p>Balance: {{ account.balance }}</p>
+            </div>
+            <div class="card-menu" id="menu-{{ account.id }}">
+              <ul>
+                <li><a href="{{ url_for('account_detail', account_id=account.id) }}">Details</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="#">Export</a></li>
+              </ul>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="budget-box">
+      <div>
+        <h2>Total budget</h2>
+        <p>{{ total_budget }}</p>
+      </div>
+      <div>
+        <p>Cash: {{ balances.cash }}</p>
+        <p>Card: {{ balances.debit }}</p>
+        <p>Crypto: {{ balances.crypto }}</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Recent Transactions</h2>
+      {% if recent_transactions %}
+        <ul class="transactions">
+          {% for tx in recent_transactions %}
+            <li>
+              <span>{{ tx.description }}</span>
+              <span>{{ tx.amount }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No transactions yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    function toggleMenu(id) {
+      const menu = document.getElementById(`menu-${id}`);
+      const visible = menu.style.display === 'block';
+      document.querySelectorAll('.card-menu').forEach(m => m.style.display = 'none');
+      menu.style.display = visible ? 'none' : 'block';
+    }
+
+    window.addEventListener('click', e => {
+      if (!e.target.matches('.menu-btn')) {
+        document.querySelectorAll('.card-menu').forEach(m => m.style.display = 'none');
+      }
+    });
+  </script>
+</body>
+</html>

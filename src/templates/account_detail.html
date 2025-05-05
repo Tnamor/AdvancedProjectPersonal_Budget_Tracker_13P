@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Account Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 space-y-6">
+
+  <!-- Account Info -->
+  <div class="bg-slate-800 p-6 rounded-md shadow">
+    <h1 class="text-2xl font-semibold mb-2">{{ account.account_name }} — Details</h1>
+    <p><strong>Bank:</strong> {{ account.bank_name }}</p>
+    <p><strong>Account Number:</strong> ****{{ account.last4 }}</p>
+    <p><strong>Balance:</strong> {{ account.balance | usd }}</p>
+  </div>
+
+  <!-- Transaction History -->
+<div class="bg-[#0f172a] p-6 rounded-md shadow w-full">
+  <h2 class="text-xl font-semibold mb-4">Transaction History</h2>
+  {% if transactions %}
+  <div class="scrollable overflow-x-auto rounded-md">
+    <table class="w-full text-left table-auto">
+      <thead class="sticky top-0 bg-[#1e293b] text-slate-200 z-10">
+        <tr>
+          <th class="w-1/4 px-4 py-3 text-left text-slate-300">Date</th>
+          <th class="w-1/2 px-4 py-3 text-left text-slate-300">Description</th>
+          <th class="w-1/4 px-4 py-3 text-right text-slate-300">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transactions %}
+        <tr class="border-b border-slate-700 hover:bg-slate-800 transition">
+          <td class="px-4 py-2 text-slate-200">{{ tx.date.strftime('%Y-%m-%d') }}</td>
+          <td class="px-4 py-2 text-slate-100">{{ tx.description }}</td>
+          <td class="px-4 py-2 text-right {% if tx.amount < 0 %}text-red-400{% else %}text-green-400{% endif %}">
+            ${{ "%.2f"|format(tx.amount) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-slate-400">No transactions found for this account.</p>
+  {% endif %}
+</div>
+
+  <!-- Spending Trend -->
+  <div class="bg-slate-800 p-6 rounded-md shadow">
+    <h2 class="text-xl font-semibold mb-4">Spending Trend</h2>
+    {% if chart_labels and chart_data %}
+    <canvas id="accountChart" class="w-full max-w-4xl mx-auto"></canvas>
+    {% else %}
+    <p class="text-slate-400">No trend data available.</p>
+    {% endif %}
+  </div>
+
+  <!-- Spending by Category -->
+  <div class="bg-slate-800 p-6 rounded-md shadow">
+    <h2 class="text-xl font-semibold mb-4">Spending by Category</h2>
+    {% if category_labels and category_values %}
+    <div class="flex flex-col md:flex-row gap-6">
+      <canvas id="categoryChart" class="max-w-sm"></canvas>
+      <ul class="category-summary flex-1 text-sm">
+        {% for label, value in category_summary %}
+        <li><strong>{{ label }}:</strong> {{ value | usd }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <p class="text-slate-400">No categorized data available.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  {% if chart_labels and chart_data %}
+  const ctx = document.getElementById("accountChart").getContext("2d");
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels | safe }},
+      datasets: [{
+        label: 'Spending',
+        data: {{ chart_data | safe }},
+        borderColor: '#60a5fa',
+        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: '#fff' }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#cbd5e1' },
+          grid: { color: '#334155' }
+        },
+        y: {
+          ticks: { color: '#cbd5e1' },
+          grid: { color: '#334155' }
+        }
+      }
+    }
+  });
+  {% endif %}
+
+  {% if category_labels and category_values %}
+  const catCtx = document.getElementById("categoryChart").getContext("2d");
+  new Chart(catCtx, {
+    type: 'doughnut',
+    data: {
+      labels: {{ category_labels | safe }},
+      datasets: [{
+        data: {{ category_values | safe }},
+        backgroundColor: ['#f87171', '#60a5fa', '#facc15', '#34d399', '#a78bfa', '#fb923c'],
+        borderColor: '#1e293b',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: { color: '#fff' }
+        }
+      }
+    }
+  });
+  {% endif %}
+</script>
+
+<!-- Extra styling -->
+<style>
+  .scrollable {
+    max-height: 16rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #64748b #1e293b;
+  }
+
+  .scrollable::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollable::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+
+  .scrollable::-webkit-scrollbar-thumb {
+    background-color: #64748b;
+    border-radius: 4px;
+  }
+
+  .category-summary {
+    list-style: none;
+    padding: 0;
+    color: #f8fafc;
+  }
+
+  .category-summary li {
+    padding: 0.25rem 0;
+  }
+</style>
+{% endblock %}

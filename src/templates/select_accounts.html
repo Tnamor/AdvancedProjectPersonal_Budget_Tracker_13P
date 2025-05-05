@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Выбор счетов</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <h1>Выберите счета для импорта</h1>
+    <form method="post">
+      {% for acc in accounts %}
+      <div class="checkbox-item">
+        <label>
+          <input type="checkbox" name="account_ids" value="{{ acc.account_id }}" />
+          <strong>{{ acc.display_name }}</strong> &mdash;
+          ****{{ acc.account_number.number[-4:] }}
+        </label>
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="btn-submit">Импортировать выбранные</button>
+      <a href="{{ url_for('dashboard') }}" class="btn-link">Отмена</a>
+    </form>
+  </div>
+</body>
+</html>

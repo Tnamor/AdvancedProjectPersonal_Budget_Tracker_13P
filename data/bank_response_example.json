@@ -1,0 +1,11 @@
+{
+  "account_id": "123abc",
+  "balance": 105.00,
+  "transactions": [
+    {
+      "date": "2025-05-04",
+      "description": "MOCK STORE LTD",
+      "amount": -23.45
+    }
+  ]
+}

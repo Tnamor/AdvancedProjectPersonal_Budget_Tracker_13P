@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- TailwindCSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+
+  <div class="flex justify-center items-center h-screen">
+    <div class="bg-gray-800 p-6 rounded-2xl shadow-md w-full max-w-md">
+      <h2 class="text-2xl font-bold text-white mb-6 text-center">Create your account</h2>
+      <form method="POST" action="{{ url_for('register') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-4">
+          {{ form.email.label(class="block text-sm font-medium text-white mb-1") }}
+          {{ form.email(class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+        </div>
+
+        <div class="mb-4">
+          {{ form.password.label(class="block text-sm font-medium text-white mb-1") }}
+          {{ form.password(class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+        </div>
+
+        <div class="mb-4">
+          {{ form.confirm.label(class="block text-sm font-medium text-white mb-1") }}
+          {{ form.confirm(class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+        </div>
+
+        <div class="mb-6">
+          {{ form.submit(class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold") }}
+        </div>
+
+        <p class="text-sm text-center">
+          Already have an account?
+          <a href="{{ url_for('login') }}" class="text-blue-400 hover:underline">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

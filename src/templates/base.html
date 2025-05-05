@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}{% endblock %} — Personal Budget Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  {% if current_user.is_authenticated %}
+  <div class="navbar">
+    <div class="nav-left">
+      <span class="logo">💸</span>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="#">Analytics</a>
+      <a href="#">Calendar</a>
+      <a href="#">Settings</a>
+    </div>
+    <div class="nav-right">
+      <a href="{{ url_for('connect_bank') }}" class="btn-connect">Connect Wallet</a>
+      <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>
